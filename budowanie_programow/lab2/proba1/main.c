@@ -1,5 +1,5 @@
 /*
-	program testujący funkcję wyznacznik
+
 */
 
 #include<stdio.h>
@@ -8,7 +8,7 @@
 #include"wyznacznik.h"
 
 
-void wczytaj_macierz(float macierz[][], int n) {
+void wczytaj_macierz(int n, float macierz[n][n]) {
 int x,y;
 
     for (x = 0; x < n; x = x + 1) {
@@ -18,8 +18,6 @@ int x,y;
 	}
 	printf("\n");
     }
-
-return;
 }
 
 int main()
@@ -30,7 +28,7 @@ int main()
     printf("\n");
     float macierz[n][n];
 
-    wczytaj_macierz(macierz, n);
+    wczytaj_macierz(n,macierz);
 
     printf("%f", wyznacznik(n, macierz));
     printf("\n");
