@@ -1,2 +1,2 @@
-int pobierz_calkowita(void);
-double pobierz_rzeczywista(void);
+int pobierz_calkowita();
+double pobierz_rzeczywista();

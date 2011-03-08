@@ -10,7 +10,7 @@
 int main() {
 	
 	double x, p;
-	x = pobierz_rzeczywista("Podaj dodatnia liczbe rzeczywista");
+	x = pobierz_rzeczywista();
 	p = sqrt(x);
 	printf("Pierwiastek z %f = %f\n", x, p);
 	
