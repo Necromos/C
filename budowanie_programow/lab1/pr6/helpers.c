@@ -4,8 +4,8 @@ int pobierz_calkowita( ) {
 	return 0;	
 }
 
-double pobierz_rzeczywista( ) {
-	double x=1.0;
+double pobierz_rzeczywista( void ) {
+	double x;
 	do {
 /*
 Warunek sprawdzajacy ujemnosc liczby po przebiegu petli.
@@ -15,7 +15,7 @@ dodatniej.
 	if (x<=0)
 		printf("To chyba zart ze podajesz liczbe ujemna do pierwiastkowania :P");
 	printf("Podaj liczbe rzeczywista ");
-	scanf("%f", &x);
+	scanf("%lf", &x);
 	}
 	while (x<=0);
 	return x;
