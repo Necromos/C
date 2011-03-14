@@ -1,17 +1,18 @@
 #include <stdio.h>
 #include "func.h"
 
-int main(){
-int n;
+int main()
+{
+    int n;
 /*
 Wczytanie wieku.
 */
-n = wczytaj();
+    n = wczytaj();
 
 /*
 Wyswietlenie wyniku w sekundach
 */
-printf("\nTwoj wiek w sekundach wynosi: %Lo\n", przelicznik(n));
+    printf("\nTwoj wiek w sekundach wynosi: %Lo\n", przelicznik(n));
 
-return 0;
+    return 0;
 }
