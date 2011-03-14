@@ -1,13 +1,17 @@
-#include<stdio.h>
-extern unsigned long long s;
-#include"func.h"
-int main(){
+#include <stdio.h>
+#include "func.h"
 
+int main(){
 int n;
-printf("Podaj swoj wiek w latach :\n");
-scanf ("%i", &n);
-s = przelicznik(n);
-printf("Twoj wiek w sekundach wynosi: %Lx\n", s);
+/*
+Wczytanie wieku.
+*/
+n = wczytaj();
+
+/*
+Wyswietlenie wyniku w sekundach
+*/
+printf("\nTwoj wiek w sekundach wynosi: %Lo\n", przelicznik(n));
 
 return 0;
 }
