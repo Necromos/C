@@ -4,15 +4,10 @@
 int main()
 {
     int n;
-/*
-Wczytanie wieku.
-*/
     n = wczytaj();
 
-/*
-Wyswietlenie wyniku w sekundach
-*/
-    printf("\nTwoj wiek w sekundach wynosi: %Lo\n", przelicznik(n));
+/*Wyswietlenie wyniku w sekundach*/
+    printf("\nTwoj wiek w sekundach wynosi: %Lu\n", przelicznik(n));
 
     return 0;
 }
