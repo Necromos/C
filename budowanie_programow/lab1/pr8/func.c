@@ -18,13 +18,18 @@ return i=a*b*c;
 
 int naj(int a, int b, int c) {
 int najm;
-if (a<b)
-	if (b<c)
-		najm=a;
-if (b<a)
-	if (a<c)
-		najm=b;
-if (c<a)
+if (a<b && b<c)
+najm = a;
+if (c<b && b<a)
+najm = c;
+if (b<a && a<c)
+najm = b;
+return najm;
+}
+
+int najw(int a, int b, int c) {
+int najwi;
+if (a>b &&
 
 
 }
