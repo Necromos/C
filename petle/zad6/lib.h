@@ -1,5 +1,3 @@
-void wczytaj_dane(float tab[6]);
-
-void posortuj(float tab[6]);
-
-void wypisz(float tab[6]);
+void wczytaj_tabele(float tab[6]);
+void posortuj_tabele(float tab[6]);
+void wypisz_wyniki(float tab[6]);

@@ -5,8 +5,8 @@ int main()
 {
     float tab[6];
 
-    wczytaj_dane(tab);
-    posortuj(tab);
-    wypisz(tab);
+    wczytaj_tabele(tab);
+    posortuj_tabele(tab);
+    wypisz_wyniki(tab);
     return 0;
 }

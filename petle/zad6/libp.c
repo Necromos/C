@@ -2,7 +2,7 @@
 
 /* funkjce do lib.c */
 
-void wczytaj_dane(float tab[6])
+void wczytaj_tabele(float tab[6])
 {
     int i;
     printf("podaj szesc liczb rzeczywistych\n");
@@ -12,7 +12,7 @@ void wczytaj_dane(float tab[6])
     }
 }
 
-void posortuj(float tab[6])
+void posortuj_tabele(float tab[6])
 {
     int i, j;
     float pom;
@@ -28,7 +28,7 @@ void posortuj(float tab[6])
     }
 }
 
-void wypisz(float tab[6])
+void wypisz_wyniki(float tab[6])
 {
     printf(" max = %.2f \n min = %.2f \n", tab[5], tab[0]);
 }
