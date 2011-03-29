@@ -2,9 +2,10 @@
 #include "lib.h"
 
 
-int main() {
+int main()
+{
 
-wyswietl_szachownice();
+    wyswietl_szachownice();
 
-return 0;
+    return 0;
 }
