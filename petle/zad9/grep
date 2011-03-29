@@ -1,0 +1,878 @@
+FSCANF(3P)                 POSIX Programmer’s Manual                FSCANF(3P)
+
+
+
+PPRROOLLOOGG
+       This  manual  page is part of the POSIX Programmer’s Manual.  The Linux
+       implementation of this interface may differ (consult the  corresponding
+       Linux  manual page for details of Linux behavior), or the interface may
+       not be implemented on Linux.
+
+NNAAMMEE
+       fscanf, scanf, sscanf - convert formatted input
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<ssttddiioo..hh>>
+
+       iinntt ffssccaannff((FFIILLEE **rreessttrriicctt _s_t_r_e_a_m,, ccoonnsstt cchhaarr **rreessttrriicctt _f_o_r_m_a_t,, ...... ));;
+       iinntt ssccaannff((ccoonnsstt cchhaarr **rreessttrriicctt _f_o_r_m_a_t,, ...... ));;
+       iinntt ssssccaannff((ccoonnsstt cchhaarr **rreessttrriicctt _s,, ccoonnsstt cchhaarr **rreessttrriicctt _f_o_r_m_a_t,, ...... ));;
+
+
+DDEESSCCRRIIPPTTIIOONN
+       The _f_s_c_a_n_f() function shall read from  the  named  input  _s_t_r_e_a_m.   The
+       _s_c_a_n_f()  function  shall read from the standard input stream _s_t_d_i_n. The
+       _s_s_c_a_n_f() function shall read from the string  _s.  Each  function  reads
+       bytes, interprets them according to a format, and stores the results in
+       its arguments. Each expects, as  arguments,  a  control  string  _f_o_r_m_a_t
+       described  below,  and  a set of _p_o_i_n_t_e_r arguments indicating where the
+       converted input should be stored. The result is undefined if there  are
+       insufficient  arguments  for  the  format.   If the format is exhausted
+       while arguments remain, the excess arguments  shall  be  evaluated  but
+       otherwise ignored.
+
+       Conversions  can be applied to the _nth argument after the _f_o_r_m_a_t in the
+       argument list, rather than to the next unused argument. In  this  case,
+       the  conversion  specifier  character  %% (see below) is replaced by the
+       sequence  ""%%_n$$"",  where  _n  is  a  decimal   integer   in   the   range
+       [1,{NL_ARGMAX}].  This  feature  provides  for the definition of format
+       strings that select arguments in an order appropriate to specific  lan-
+       guages. In format strings containing the ""%%_n$$"" form of conversion spec-
+       ifications, it is unspecified whether numbered arguments in  the  argu-
+       ment list can be referenced from the format string more than once.
+
+       The  _f_o_r_m_a_t  can contain either form of a conversion specification-that
+       is, %% or ""%%_n$$""-but the two forms cannot be mixed within a single _f_o_r_m_a_t
+       string.  The  only exception to this is that %%%% or %%** can be mixed with
+       the ""%%_n$$"" form. When numbered argument specifications are used,  speci-
+       fying  the  _Nth  argument requires that all the leading arguments, from
+       the first to the ( _N-1)th, are pointers.
+
+       The _f_s_c_a_n_f() function in all its forms shall allow detection of a  lan-
+       guage-dependent  radix character in the input string. The radix charac-
+       ter is defined in the program’s locale (category _L_C___N_U_M_E_R_I_C _)_.  In  the
+       POSIX  locale, or in a locale where the radix character is not defined,
+       the radix character shall default to a period ( ’’..’’ ).
+
+       The format is a character string, beginning and ending in  its  initial
+       shift  state, if any, composed of zero or more directives.  Each direc-
+       tive is composed of one of the following: one or more white-space char-
+       acters  (  <space>s,  <tab>s,  <newline>s,  <vertical-tab>s,  or <form-
+       feed>s); an ordinary character (neither ’’%%’’ nor a  white-space  charac-
+       ter);  or  a conversion specification. Each conversion specification is
+       introduced by the character ’’%%’’  or the character sequence ""%%_n$$"", after
+       which the following appear in sequence:
+
+        * An optional assignment-suppressing character ’’**’’ .
+
+
+        * An  optional  non-zero  decimal  integer  that specifies the maximum
+          field width.
+
+
+        * An option length modifier that specifies the size of  the  receiving
+          object.
+
+
+        * A  _c_o_n_v_e_r_s_i_o_n _s_p_e_c_i_f_i_e_r character that specifies the type of conver-
+          sion to be applied. The valid conversion  specifiers  are  described
+          below.
+
+
+       The  _f_s_c_a_n_f()  functions  shall execute each directive of the format in
+       turn. If a directive fails,  as  detailed  below,  the  function  shall
+       return.  Failures  are described as input failures (due to the unavail-
+       ability of input bytes) or  matching  failures  (due  to  inappropriate
+       input).
+
+       A  directive  composed  of  one or more white-space characters shall be
+       executed by reading input until no more valid input can be read, or  up
+       to  the  first byte which is not a white-space character, which remains
+       unread.
+
+       A directive that is an ordinary character shall be executed as follows:
+       the  next  byte shall be read from the input and compared with the byte
+       that comprises the directive; if the comparison shows that they are not
+       equivalent,  the directive shall fail, and the differing and subsequent
+       bytes shall remain  unread.  Similarly,  if  end-of-file,  an  encoding
+       error, or a read error prevents a character from being read, the direc-
+       tive shall fail.
+
+       A directive that is a conversion specification defines a set of  match-
+       ing  input sequences, as described below for each conversion character.
+       A conversion specification shall be executed in the following steps.
+
+       Input white-space characters  (as  specified  by  _i_s_s_p_a_c_e())  shall  be
+       skipped,  unless  the conversion specification includes a [[, cc, CC, or nn
+       conversion specifier.
+
+       An item shall be read from the input, unless the conversion  specifica-
+       tion includes an nn conversion specifier. An input item shall be defined
+       as the longest sequence of input bytes (up  to  any  specified  maximum
+       field  width, which may be measured in characters or bytes dependent on
+       the conversion specifier) which is an initial subsequence of a matching
+       sequence.  The  first  byte,  if any, after the input item shall remain
+       unread. If the length of the input item is 0, the execution of the con-
+       version specification shall fail; this condition is a matching failure,
+       unless end-of-file, an encoding error, or a read error prevented  input
+       from the stream, in which case it is an input failure.
+
+       Except  in the case of a %% conversion specifier, the input item (or, in
+       the case of a %%nn conversion specification, the count  of  input  bytes)
+       shall  be  converted to a type appropriate to the conversion character.
+       If the input item is not a matching sequence, the execution of the con-
+       version  specification  fails;  this  condition  is a matching failure.
+       Unless assignment suppression was indicated by a ’’**’’, the result of the
+       conversion  shall be placed in the object pointed to by the first argu-
+       ment following the _f_o_r_m_a_t argument that has not already received a con-
+       version  result if the conversion specification is introduced by %%,  or
+       in the _nth argument if introduced by the character sequence ""%%_n$$"".   If
+       this  object does not have an appropriate type, or if the result of the
+       conversion cannot be represented in the space provided, the behavior is
+       undefined.
+
+       The length modifiers and their meanings are:
+
+       hhhh     Specifies  that  a  following  dd, ii, oo, uu, xx, XX, or nn conversion
+              specifier applies to an argument with  type  pointer  to  ssiiggnneedd
+              cchhaarr or uunnssiiggnneedd cchhaarr.
+
+       hh      Specifies  that  a  following  dd, ii, oo, uu, xx, XX, or nn conversion
+              specifier applies to an argument with type pointer to  sshhoorrtt  or
+              uunnssiiggnneedd sshhoorrtt.
+
+       ll (ell)
+              Specifies  that  a  following  dd, ii, oo, uu, xx, XX, or nn conversion
+              specifier applies to an argument with type pointer  to  lloonngg  or
+              uunnssiiggnneedd  lloonngg;  that a following aa, AA, ee, EE, ff, FF, gg, or GG con-
+              version specifier applies to an argument with  type  pointer  to
+              ddoouubbllee;  or  that  a  following  cc, ss, or [[ conversion specifier
+              applies to an argument with type pointer to wwcchhaarr__tt.
+
+       llll (ell-ell)
+
+              Specifies that a following dd, ii, oo, uu, xx,  XX,  or  nn  conversion
+              specifier  applies to an argument with type pointer to lloonngg lloonngg
+              or uunnssiiggnneedd lloonngg lloonngg.
+
+       jj      Specifies that a following dd, ii, oo, uu, xx,  XX,  or  nn  conversion
+              specifier  applies  to an argument with type pointer to iinnttmmaaxx__tt
+              or uuiinnttmmaaxx__tt.
+
+       zz      Specifies that a following dd, ii, oo, uu, xx,  XX,  or  nn  conversion
+              specifier  applies to an argument with type pointer to ssiizzee__tt or
+              the corresponding signed integer type.
+
+       tt      Specifies that a following dd, ii, oo, uu, xx,  XX,  or  nn  conversion
+              specifier  applies to an argument with type pointer to ppttrrddiiffff__tt
+              or the corresponding uunnssiiggnneedd type.
+
+       LL      Specifies that a following aa, AA, ee, EE, ff, FF, gg, or GG  conversion
+              specifier  applies to an argument with type pointer to lloonngg ddoouu--
+              bbllee.
+
+
+       If a length modifier appears with any conversion specifier  other  than
+       as specified above, the behavior is undefined.
+
+       The following conversion specifiers are valid:
+
+       dd      Matches  an  optionally  signed decimal integer, whose format is
+              the same as expected for the subject sequence of  _s_t_r_t_o_l()  with
+              the  value  10  for  the _b_a_s_e argument. In the absence of a size
+              modifier, the application shall ensure  that  the  corresponding
+              argument is a pointer to iinntt.
+
+       ii      Matches  an  optionally signed integer, whose format is the same
+              as expected for the subject sequence of _s_t_r_t_o_l() with 0 for  the
+              _b_a_s_e  argument.  In the absence of a size modifier, the applica-
+              tion shall ensure that the corresponding argument is  a  pointer
+              to iinntt.
+
+       oo      Matches  an optionally signed octal integer, whose format is the
+              same as expected for the subject sequence of _s_t_r_t_o_u_l() with  the
+              value  8  for  the _b_a_s_e argument. In the absence of a size modi-
+              fier, the application shall ensure that the corresponding  argu-
+              ment is a pointer to uunnssiiggnneedd.
+
+       uu      Matches  an  optionally  signed decimal integer, whose format is
+              the same as expected for the subject sequence of _s_t_r_t_o_u_l()  with
+              the  value  10  for  the _b_a_s_e argument. In the absence of a size
+              modifier, the application shall ensure  that  the  corresponding
+              argument is a pointer to uunnssiiggnneedd.
+
+       xx      Matches  an  optionally signed hexadecimal integer, whose format
+              is the same as expected for the subject  sequence  of  _s_t_r_t_o_u_l()
+              with  the  value  16  for the _b_a_s_e argument. In the absence of a
+              size modifier, the application shall ensure that the correspond-
+              ing argument is a pointer to uunnssiiggnneedd.
+
+       aa, ee, ff, gg
+
+              Matches an optionally signed floating-point number, infinity, or
+              NaN, whose format is  the  same  as  expected  for  the  subject
+              sequence  of  _s_t_r_t_o_d().  In  the absence of a size modifier, the
+              application shall ensure that the corresponding  argument  is  a
+              pointer to ffllooaatt.
+
+       If  the _f_p_r_i_n_t_f() family of functions generates character string repre-
+       sentations for infinity and NaN (a symbolic entity encoded in floating-
+       point  format)  to  support  IEEE Std 754-1985,  the _f_s_c_a_n_f() family of
+       functions shall recognize them as input.
+
+       ss      Matches a sequence of bytes that are not white-space characters.
+              The  application shall ensure that the corresponding argument is
+              a pointer to the initial byte of an array of cchhaarr, ssiiggnneedd  cchhaarr,
+              or  uunnssiiggnneedd cchhaarr large enough to accept the sequence and a ter-
+              minating null character code, which  shall  be  added  automati-
+              cally.
+
+       If  an ll (ell) qualifier is present, the input is a sequence of charac-
+       ters that begins in the initial shift state. Each  character  shall  be
+       converted  to  a  wide character as if by a call to the _m_b_r_t_o_w_c() func-
+       tion, with the conversion state described by an mmbbssttaattee__tt  object  ini-
+       tialized  to zero before the first character is converted. The applica-
+       tion shall ensure that the corresponding argument is a  pointer  to  an
+       array  of wwcchhaarr__tt large enough to accept the sequence and the terminat-
+       ing null wide character, which shall be added automatically.
+
+       [[      Matches a non-empty sequence of bytes from  a  set  of  expected
+              bytes (the _s_c_a_n_s_e_t). The normal skip over white-space characters
+              shall be suppressed in this case. The application  shall  ensure
+              that the corresponding argument is a pointer to the initial byte
+              of an array of cchhaarr, ssiiggnneedd cchhaarr, or uunnssiiggnneedd cchhaarr large  enough
+              to  accept the sequence and a terminating null byte, which shall
+              be added automatically.
+
+       If an ll (ell) qualifier is present, the input is a sequence of  charac-
+       ters  that  begins  in  the  initial shift state. Each character in the
+       sequence shall be converted to a wide character as if by a call to  the
+       _m_b_r_t_o_w_c() function, with the conversion state described by an mmbbssttaattee__tt
+       object initialized to zero before the first character is converted. The
+       application  shall  ensure that the corresponding argument is a pointer
+       to an array of wwcchhaarr__tt large enough to accept the sequence and the ter-
+       minating null wide character, which shall be added automatically.
+
+       The  conversion specification includes all subsequent bytes in the _f_o_r_-
+       _m_a_t string up to and including the matching right square bracket (  ’’]]’’
+       ).  The  bytes  between the square brackets (the _s_c_a_n_l_i_s_t) comprise the
+       scanset, unless the byte after the left square bracket is a  circumflex
+       (  ’’^^’’  ),  in  which  case  the scanset contains all bytes that do not
+       appear in the scanlist between the  circumflex  and  the  right  square
+       bracket.   If  the  conversion specification begins with ""[[]]"" or ""[[^^]]"",
+       the right square bracket is included in the scanlist and the next right
+       square  bracket is the matching right square bracket that ends the con-
+       version specification; otherwise, the first right square bracket is the
+       one that ends the conversion specification. If a ’’--’’ is in the scanlist
+       and is not the first character, nor the second where the first  charac-
+       ter  is  a ’’^^’’, nor the last character, the behavior is implementation-
+       defined.
+
+       cc      Matches a sequence of bytes of the number specified by the field
+              width (1 if no field width is present in the conversion specifi-
+              cation). The application shall  ensure  that  the  corresponding
+              argument  is  a pointer to the initial byte of an array of cchhaarr,
+              ssiiggnneedd cchhaarr,  or  uunnssiiggnneedd  cchhaarr  large  enough  to  accept  the
+              sequence.  No  null  byte  is added. The normal skip over white-
+              space characters shall be suppressed in this case.
+
+       If an ll (ell) qualifier is present, the input shall be  a  sequence  of
+       characters  that  begins in the initial shift state.  Each character in
+       the sequence is converted to a wide character as if by a  call  to  the
+       _m_b_r_t_o_w_c() function, with the conversion state described by an mmbbssttaattee__tt
+       object initialized to zero before the first character is converted. The
+       application  shall  ensure that the corresponding argument is a pointer
+       to an array of wwcchhaarr__tt large enough to accept the resulting sequence of
+       wide characters. No null wide character is added.
+
+       pp      Matches  an implementation-defined set of sequences, which shall
+              be the same as the set of sequences that is produced by  the  %%pp
+              conversion  specification  of  the corresponding _f_p_r_i_n_t_f() func-
+              tions. The application shall ensure that the corresponding argu-
+              ment  is  a  pointer to a pointer to vvooiidd. The interpretation of
+              the input item is implementation-defined. If the input item is a
+              value  converted  earlier during the same program execution, the
+              pointer that results shall compare equal to that  value;  other-
+              wise,  the  behavior of the %%pp conversion specification is unde-
+              fined.
+
+       nn      No input is consumed. The application shall ensure that the cor-
+              responding argument is a pointer to the integer into which shall
+              be written the number of bytes read from the  input  so  far  by
+              this  call  to the _f_s_c_a_n_f() functions. Execution of a %%nn conver-
+              sion specification shall  not  increment  the  assignment  count
+              returned  at  the  completion  of  execution of the function. No
+              argument shall be converted, but one shall be consumed.  If  the
+              conversion   specification  includes  an  assignment-suppressing
+              character or a field width, the behavior is undefined.
+
+       CC      Equivalent to llcc .
+
+       SS      Equivalent to llss .
+
+       %%      Matches a single ’’%%’’  character;  no  conversion  or  assignment
+              occurs. The complete conversion specification shall be %%%% .
+
+
+       If a conversion specification is invalid, the behavior is undefined.
+
+       The conversion specifiers AA, EE, FF, GG, and XX are also valid and shall be
+       equivalent to aa, ee, ff, gg, and xx, respectively.
+
+       If end-of-file is encountered during input, conversion shall be  termi-
+       nated.   If  end-of-file  occurs  before any bytes matching the current
+       conversion specification (except for %%nn ) have been  read  (other  than
+       leading white-space characters, where permitted), execution of the cur-
+       rent conversion specification shall terminate with  an  input  failure.
+       Otherwise,  unless execution of the current conversion specification is
+       terminated with a matching failure, execution of the following  conver-
+       sion  specification (if any) shall be terminated with an input failure.
+
+       Reaching the end of the string  in  _s_s_c_a_n_f()  shall  be  equivalent  to
+       encountering end-of-file for _f_s_c_a_n_f().
+
+       If conversion terminates on a conflicting input, the offending input is
+       left  unread  in  the  input.  Any  trailing  white  space   (including
+       <newline>s)  shall be left unread unless matched by a conversion speci-
+       fication. The success of literal matches and suppressed assignments  is
+       only directly determinable via the %%nn conversion specification.
+
+       The  _f_s_c_a_n_f()  and _s_c_a_n_f() functions may mark the _s_t___a_t_i_m_e field of the
+       file associated with _s_t_r_e_a_m for update. The  _s_t___a_t_i_m_e  field  shall  be
+       marked  for  update  by  the  first  successful  execution  of _f_g_e_t_c(),
+       _f_g_e_t_s(), _f_r_e_a_d(), _g_e_t_c(),  _g_e_t_c_h_a_r(),  _g_e_t_s(),  _f_s_c_a_n_f(),  or  _f_s_c_a_n_f()
+       using  _s_t_r_e_a_m  that  returns  data  not  supplied  by  a  prior call to
+       _u_n_g_e_t_c().
+
+RREETTUURRNN VVAALLUUEE
+       Upon successful completion, these functions shall return the number  of
+       successfully  matched and assigned input items; this number can be zero
+       in the event of an early matching failure. If the input ends before the
+       first  matching failure or conversion, EOF shall be returned. If a read
+       error occurs, the error indicator for the stream is set, EOF  shall  be
+       returned,  and _e_r_r_n_o shall be set to indicate the error.
+
+EERRRROORRSS
+       For  the  conditions  under  which  the _f_s_c_a_n_f() functions fail and may
+       fail, refer to _f_g_e_t_c() or _f_g_e_t_w_c().
+
+       In addition, _f_s_c_a_n_f() may fail if:
+
+       EEIILLSSEEQQ Input byte sequence does not form a valid character.
+
+       EEIINNVVAALL There are insufficient arguments.
+
+
+       _T_h_e _f_o_l_l_o_w_i_n_g _s_e_c_t_i_o_n_s _a_r_e _i_n_f_o_r_m_a_t_i_v_e_.
+
+EEXXAAMMPPLLEESS
+       The call:
+
+
+              iinntt ii,, nn;; ffllooaatt xx;; cchhaarr nnaammee[[5500]];;
+              nn == ssccaannff((""%%dd%%ff%%ss"",, &&ii,, &&xx,, nnaammee));;
+
+       with the input line:
+
+
+              2255 5544..3322EE--11 HHaammsstteerr
+
+       assigns to _n the value 3, to _i the value 25, to _x the value 5.432,  and
+       _n_a_m_e contains the string ""HHaammsstteerr"" .
+
+       The call:
+
+
+              iinntt ii;; ffllooaatt xx;; cchhaarr nnaammee[[5500]];;
+              ((vvooiidd)) ssccaannff((""%%22dd%%ff%%**dd %%[[00112233445566778899]]"",, &&ii,, &&xx,, nnaammee));;
+
+       with input:
+
+
+              5566778899 00112233 5566aa7722
+
+       assigns  56  to _i, 789.0 to _x, skips 0123, and places the string ""5566\\00""
+       in _n_a_m_e. The next call to _g_e_t_c_h_a_r() shall return the character ’’aa’’ .
+
+   RReeaaddiinngg DDaattaa iinnttoo aann AArrrraayy
+       The following call uses _f_s_c_a_n_f() to read three  floating-point  numbers
+       from standard input into the _i_n_p_u_t array.
+
+
+              ffllooaatt iinnppuutt[[33]];; ffssccaannff ((ssttddiinn,, ""%%ff %%ff %%ff"",, iinnppuutt,, iinnppuutt++11,, iinnppuutt++22));;
+
+AAPPPPLLIICCAATTIIOONN UUSSAAGGEE
+       If  the  application calling _f_s_c_a_n_f() has any objects of type wwiinntt__tt or
+       wwcchhaarr__tt, it must also  include  the  _<_w_c_h_a_r_._h_>  header  to  have  these
+       objects defined.
+
+RRAATTIIOONNAALLEE
+       This  function  is  aligned with the ISO/IEC 9899:1999 standard, and in
+       doing so a few "obvious" things were not included.   Specifically,  the
+       set  of characters allowed in a scanset is limited to single-byte char-
+       acters. In other similar places, multi-byte characters have  been  per-
+       mitted,  but  for alignment with the ISO/IEC 9899:1999 standard, it has
+       not been done here. Applications needing this could use the correspond-
+       ing wide-character functions to achieve the desired results.
+
+FFUUTTUURREE DDIIRREECCTTIIOONNSS
+       None.
+
+SSEEEE AALLSSOO
+       _g_e_t_c(),  _p_r_i_n_t_f(),  _s_e_t_l_o_c_a_l_e(),  _s_t_r_t_o_d(),  _s_t_r_t_o_l(),  _s_t_r_t_o_u_l(), _w_c_r_-
+       _t_o_m_b(), the Base Definitions volume of IEEE Std 1003.1-2001, Chapter 7,
+       Locale, _<_l_a_n_g_i_n_f_o_._h_>, _<_s_t_d_i_o_._h_>, _<_w_c_h_a_r_._h_>
+
+CCOOPPYYRRIIGGHHTT
+       Portions  of  this text are reprinted and reproduced in electronic form
+       from IEEE Std 1003.1, 2003 Edition, Standard for Information Technology
+       --  Portable  Operating  System  Interface (POSIX), The Open Group Base
+       Specifications Issue 6, Copyright (C) 2001-2003  by  the  Institute  of
+       Electrical  and  Electronics  Engineers, Inc and The Open Group. In the
+       event of any discrepancy between this version and the original IEEE and
+       The  Open Group Standard, the original IEEE and The Open Group Standard
+       is the referee document. The original Standard can be  obtained  online
+       at http://www.opengroup.org/unix/online.html .
+
+
+
+IEEE/The Open Group                  2003                           FSCANF(3P)
+FSCANF(3P)                 POSIX Programmer’s Manual                FSCANF(3P)
+
+
+
+PPRROOLLOOGG
+       This  manual  page is part of the POSIX Programmer’s Manual.  The Linux
+       implementation of this interface may differ (consult the  corresponding
+       Linux  manual page for details of Linux behavior), or the interface may
+       not be implemented on Linux.
+
+NNAAMMEE
+       fscanf, scanf, sscanf - convert formatted input
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<ssttddiioo..hh>>
+
+       iinntt ffssccaannff((FFIILLEE **rreessttrriicctt _s_t_r_e_a_m,, ccoonnsstt cchhaarr **rreessttrriicctt _f_o_r_m_a_t,, ...... ));;
+       iinntt ssccaannff((ccoonnsstt cchhaarr **rreessttrriicctt _f_o_r_m_a_t,, ...... ));;
+       iinntt ssssccaannff((ccoonnsstt cchhaarr **rreessttrriicctt _s,, ccoonnsstt cchhaarr **rreessttrriicctt _f_o_r_m_a_t,, ...... ));;
+
+
+DDEESSCCRRIIPPTTIIOONN
+       The _f_s_c_a_n_f() function shall read from  the  named  input  _s_t_r_e_a_m.   The
+       _s_c_a_n_f()  function  shall read from the standard input stream _s_t_d_i_n. The
+       _s_s_c_a_n_f() function shall read from the string  _s.  Each  function  reads
+       bytes, interprets them according to a format, and stores the results in
+       its arguments. Each expects, as  arguments,  a  control  string  _f_o_r_m_a_t
+       described  below,  and  a set of _p_o_i_n_t_e_r arguments indicating where the
+       converted input should be stored. The result is undefined if there  are
+       insufficient  arguments  for  the  format.   If the format is exhausted
+       while arguments remain, the excess arguments  shall  be  evaluated  but
+       otherwise ignored.
+
+       Conversions  can be applied to the _nth argument after the _f_o_r_m_a_t in the
+       argument list, rather than to the next unused argument. In  this  case,
+       the  conversion  specifier  character  %% (see below) is replaced by the
+       sequence  ""%%_n$$"",  where  _n  is  a  decimal   integer   in   the   range
+       [1,{NL_ARGMAX}].  This  feature  provides  for the definition of format
+       strings that select arguments in an order appropriate to specific  lan-
+       guages. In format strings containing the ""%%_n$$"" form of conversion spec-
+       ifications, it is unspecified whether numbered arguments in  the  argu-
+       ment list can be referenced from the format string more than once.
+
+       The  _f_o_r_m_a_t  can contain either form of a conversion specification-that
+       is, %% or ""%%_n$$""-but the two forms cannot be mixed within a single _f_o_r_m_a_t
+       string.  The  only exception to this is that %%%% or %%** can be mixed with
+       the ""%%_n$$"" form. When numbered argument specifications are used,  speci-
+       fying  the  _Nth  argument requires that all the leading arguments, from
+       the first to the ( _N-1)th, are pointers.
+
+       The _f_s_c_a_n_f() function in all its forms shall allow detection of a  lan-
+       guage-dependent  radix character in the input string. The radix charac-
+       ter is defined in the program’s locale (category _L_C___N_U_M_E_R_I_C _)_.  In  the
+       POSIX  locale, or in a locale where the radix character is not defined,
+       the radix character shall default to a period ( ’’..’’ ).
+
+       The format is a character string, beginning and ending in  its  initial
+       shift  state, if any, composed of zero or more directives.  Each direc-
+       tive is composed of one of the following: one or more white-space char-
+       acters  (  <space>s,  <tab>s,  <newline>s,  <vertical-tab>s,  or <form-
+       feed>s); an ordinary character (neither ’’%%’’ nor a  white-space  charac-
+       ter);  or  a conversion specification. Each conversion specification is
+       introduced by the character ’’%%’’  or the character sequence ""%%_n$$"", after
+       which the following appear in sequence:
+
+        * An optional assignment-suppressing character ’’**’’ .
+
+
+        * An  optional  non-zero  decimal  integer  that specifies the maximum
+          field width.
+
+
+        * An option length modifier that specifies the size of  the  receiving
+          object.
+
+
+        * A  _c_o_n_v_e_r_s_i_o_n _s_p_e_c_i_f_i_e_r character that specifies the type of conver-
+          sion to be applied. The valid conversion  specifiers  are  described
+          below.
+
+
+       The  _f_s_c_a_n_f()  functions  shall execute each directive of the format in
+       turn. If a directive fails,  as  detailed  below,  the  function  shall
+       return.  Failures  are described as input failures (due to the unavail-
+       ability of input bytes) or  matching  failures  (due  to  inappropriate
+       input).
+
+       A  directive  composed  of  one or more white-space characters shall be
+       executed by reading input until no more valid input can be read, or  up
+       to  the  first byte which is not a white-space character, which remains
+       unread.
+
+       A directive that is an ordinary character shall be executed as follows:
+       the  next  byte shall be read from the input and compared with the byte
+       that comprises the directive; if the comparison shows that they are not
+       equivalent,  the directive shall fail, and the differing and subsequent
+       bytes shall remain  unread.  Similarly,  if  end-of-file,  an  encoding
+       error, or a read error prevents a character from being read, the direc-
+       tive shall fail.
+
+       A directive that is a conversion specification defines a set of  match-
+       ing  input sequences, as described below for each conversion character.
+       A conversion specification shall be executed in the following steps.
+
+       Input white-space characters  (as  specified  by  _i_s_s_p_a_c_e())  shall  be
+       skipped,  unless  the conversion specification includes a [[, cc, CC, or nn
+       conversion specifier.
+
+       An item shall be read from the input, unless the conversion  specifica-
+       tion includes an nn conversion specifier. An input item shall be defined
+       as the longest sequence of input bytes (up  to  any  specified  maximum
+       field  width, which may be measured in characters or bytes dependent on
+       the conversion specifier) which is an initial subsequence of a matching
+       sequence.  The  first  byte,  if any, after the input item shall remain
+       unread. If the length of the input item is 0, the execution of the con-
+       version specification shall fail; this condition is a matching failure,
+       unless end-of-file, an encoding error, or a read error prevented  input
+       from the stream, in which case it is an input failure.
+
+       Except  in the case of a %% conversion specifier, the input item (or, in
+       the case of a %%nn conversion specification, the count  of  input  bytes)
+       shall  be  converted to a type appropriate to the conversion character.
+       If the input item is not a matching sequence, the execution of the con-
+       version  specification  fails;  this  condition  is a matching failure.
+       Unless assignment suppression was indicated by a ’’**’’, the result of the
+       conversion  shall be placed in the object pointed to by the first argu-
+       ment following the _f_o_r_m_a_t argument that has not already received a con-
+       version  result if the conversion specification is introduced by %%,  or
+       in the _nth argument if introduced by the character sequence ""%%_n$$"".   If
+       this  object does not have an appropriate type, or if the result of the
+       conversion cannot be represented in the space provided, the behavior is
+       undefined.
+
+       The length modifiers and their meanings are:
+
+       hhhh     Specifies  that  a  following  dd, ii, oo, uu, xx, XX, or nn conversion
+              specifier applies to an argument with  type  pointer  to  ssiiggnneedd
+              cchhaarr or uunnssiiggnneedd cchhaarr.
+
+       hh      Specifies  that  a  following  dd, ii, oo, uu, xx, XX, or nn conversion
+              specifier applies to an argument with type pointer to  sshhoorrtt  or
+              uunnssiiggnneedd sshhoorrtt.
+
+       ll (ell)
+              Specifies  that  a  following  dd, ii, oo, uu, xx, XX, or nn conversion
+              specifier applies to an argument with type pointer  to  lloonngg  or
+              uunnssiiggnneedd  lloonngg;  that a following aa, AA, ee, EE, ff, FF, gg, or GG con-
+              version specifier applies to an argument with  type  pointer  to
+              ddoouubbllee;  or  that  a  following  cc, ss, or [[ conversion specifier
+              applies to an argument with type pointer to wwcchhaarr__tt.
+
+       llll (ell-ell)
+
+              Specifies that a following dd, ii, oo, uu, xx,  XX,  or  nn  conversion
+              specifier  applies to an argument with type pointer to lloonngg lloonngg
+              or uunnssiiggnneedd lloonngg lloonngg.
+
+       jj      Specifies that a following dd, ii, oo, uu, xx,  XX,  or  nn  conversion
+              specifier  applies  to an argument with type pointer to iinnttmmaaxx__tt
+              or uuiinnttmmaaxx__tt.
+
+       zz      Specifies that a following dd, ii, oo, uu, xx,  XX,  or  nn  conversion
+              specifier  applies to an argument with type pointer to ssiizzee__tt or
+              the corresponding signed integer type.
+
+       tt      Specifies that a following dd, ii, oo, uu, xx,  XX,  or  nn  conversion
+              specifier  applies to an argument with type pointer to ppttrrddiiffff__tt
+              or the corresponding uunnssiiggnneedd type.
+
+       LL      Specifies that a following aa, AA, ee, EE, ff, FF, gg, or GG  conversion
+              specifier  applies to an argument with type pointer to lloonngg ddoouu--
+              bbllee.
+
+
+       If a length modifier appears with any conversion specifier  other  than
+       as specified above, the behavior is undefined.
+
+       The following conversion specifiers are valid:
+
+       dd      Matches  an  optionally  signed decimal integer, whose format is
+              the same as expected for the subject sequence of  _s_t_r_t_o_l()  with
+              the  value  10  for  the _b_a_s_e argument. In the absence of a size
+              modifier, the application shall ensure  that  the  corresponding
+              argument is a pointer to iinntt.
+
+       ii      Matches  an  optionally signed integer, whose format is the same
+              as expected for the subject sequence of _s_t_r_t_o_l() with 0 for  the
+              _b_a_s_e  argument.  In the absence of a size modifier, the applica-
+              tion shall ensure that the corresponding argument is  a  pointer
+              to iinntt.
+
+       oo      Matches  an optionally signed octal integer, whose format is the
+              same as expected for the subject sequence of _s_t_r_t_o_u_l() with  the
+              value  8  for  the _b_a_s_e argument. In the absence of a size modi-
+              fier, the application shall ensure that the corresponding  argu-
+              ment is a pointer to uunnssiiggnneedd.
+
+       uu      Matches  an  optionally  signed decimal integer, whose format is
+              the same as expected for the subject sequence of _s_t_r_t_o_u_l()  with
+              the  value  10  for  the _b_a_s_e argument. In the absence of a size
+              modifier, the application shall ensure  that  the  corresponding
+              argument is a pointer to uunnssiiggnneedd.
+
+       xx      Matches  an  optionally signed hexadecimal integer, whose format
+              is the same as expected for the subject  sequence  of  _s_t_r_t_o_u_l()
+              with  the  value  16  for the _b_a_s_e argument. In the absence of a
+              size modifier, the application shall ensure that the correspond-
+              ing argument is a pointer to uunnssiiggnneedd.
+
+       aa, ee, ff, gg
+
+              Matches an optionally signed floating-point number, infinity, or
+              NaN, whose format is  the  same  as  expected  for  the  subject
+              sequence  of  _s_t_r_t_o_d().  In  the absence of a size modifier, the
+              application shall ensure that the corresponding  argument  is  a
+              pointer to ffllooaatt.
+
+       If  the _f_p_r_i_n_t_f() family of functions generates character string repre-
+       sentations for infinity and NaN (a symbolic entity encoded in floating-
+       point  format)  to  support  IEEE Std 754-1985,  the _f_s_c_a_n_f() family of
+       functions shall recognize them as input.
+
+       ss      Matches a sequence of bytes that are not white-space characters.
+              The  application shall ensure that the corresponding argument is
+              a pointer to the initial byte of an array of cchhaarr, ssiiggnneedd  cchhaarr,
+              or  uunnssiiggnneedd cchhaarr large enough to accept the sequence and a ter-
+              minating null character code, which  shall  be  added  automati-
+              cally.
+
+       If  an ll (ell) qualifier is present, the input is a sequence of charac-
+       ters that begins in the initial shift state. Each  character  shall  be
+       converted  to  a  wide character as if by a call to the _m_b_r_t_o_w_c() func-
+       tion, with the conversion state described by an mmbbssttaattee__tt  object  ini-
+       tialized  to zero before the first character is converted. The applica-
+       tion shall ensure that the corresponding argument is a  pointer  to  an
+       array  of wwcchhaarr__tt large enough to accept the sequence and the terminat-
+       ing null wide character, which shall be added automatically.
+
+       [[      Matches a non-empty sequence of bytes from  a  set  of  expected
+              bytes (the _s_c_a_n_s_e_t). The normal skip over white-space characters
+              shall be suppressed in this case. The application  shall  ensure
+              that the corresponding argument is a pointer to the initial byte
+              of an array of cchhaarr, ssiiggnneedd cchhaarr, or uunnssiiggnneedd cchhaarr large  enough
+              to  accept the sequence and a terminating null byte, which shall
+              be added automatically.
+
+       If an ll (ell) qualifier is present, the input is a sequence of  charac-
+       ters  that  begins  in  the  initial shift state. Each character in the
+       sequence shall be converted to a wide character as if by a call to  the
+       _m_b_r_t_o_w_c() function, with the conversion state described by an mmbbssttaattee__tt
+       object initialized to zero before the first character is converted. The
+       application  shall  ensure that the corresponding argument is a pointer
+       to an array of wwcchhaarr__tt large enough to accept the sequence and the ter-
+       minating null wide character, which shall be added automatically.
+
+       The  conversion specification includes all subsequent bytes in the _f_o_r_-
+       _m_a_t string up to and including the matching right square bracket (  ’’]]’’
+       ).  The  bytes  between the square brackets (the _s_c_a_n_l_i_s_t) comprise the
+       scanset, unless the byte after the left square bracket is a  circumflex
+       (  ’’^^’’  ),  in  which  case  the scanset contains all bytes that do not
+       appear in the scanlist between the  circumflex  and  the  right  square
+       bracket.   If  the  conversion specification begins with ""[[]]"" or ""[[^^]]"",
+       the right square bracket is included in the scanlist and the next right
+       square  bracket is the matching right square bracket that ends the con-
+       version specification; otherwise, the first right square bracket is the
+       one that ends the conversion specification. If a ’’--’’ is in the scanlist
+       and is not the first character, nor the second where the first  charac-
+       ter  is  a ’’^^’’, nor the last character, the behavior is implementation-
+       defined.
+
+       cc      Matches a sequence of bytes of the number specified by the field
+              width (1 if no field width is present in the conversion specifi-
+              cation). The application shall  ensure  that  the  corresponding
+              argument  is  a pointer to the initial byte of an array of cchhaarr,
+              ssiiggnneedd cchhaarr,  or  uunnssiiggnneedd  cchhaarr  large  enough  to  accept  the
+              sequence.  No  null  byte  is added. The normal skip over white-
+              space characters shall be suppressed in this case.
+
+       If an ll (ell) qualifier is present, the input shall be  a  sequence  of
+       characters  that  begins in the initial shift state.  Each character in
+       the sequence is converted to a wide character as if by a  call  to  the
+       _m_b_r_t_o_w_c() function, with the conversion state described by an mmbbssttaattee__tt
+       object initialized to zero before the first character is converted. The
+       application  shall  ensure that the corresponding argument is a pointer
+       to an array of wwcchhaarr__tt large enough to accept the resulting sequence of
+       wide characters. No null wide character is added.
+
+       pp      Matches  an implementation-defined set of sequences, which shall
+              be the same as the set of sequences that is produced by  the  %%pp
+              conversion  specification  of  the corresponding _f_p_r_i_n_t_f() func-
+              tions. The application shall ensure that the corresponding argu-
+              ment  is  a  pointer to a pointer to vvooiidd. The interpretation of
+              the input item is implementation-defined. If the input item is a
+              value  converted  earlier during the same program execution, the
+              pointer that results shall compare equal to that  value;  other-
+              wise,  the  behavior of the %%pp conversion specification is unde-
+              fined.
+
+       nn      No input is consumed. The application shall ensure that the cor-
+              responding argument is a pointer to the integer into which shall
+              be written the number of bytes read from the  input  so  far  by
+              this  call  to the _f_s_c_a_n_f() functions. Execution of a %%nn conver-
+              sion specification shall  not  increment  the  assignment  count
+              returned  at  the  completion  of  execution of the function. No
+              argument shall be converted, but one shall be consumed.  If  the
+              conversion   specification  includes  an  assignment-suppressing
+              character or a field width, the behavior is undefined.
+
+       CC      Equivalent to llcc .
+
+       SS      Equivalent to llss .
+
+       %%      Matches a single ’’%%’’  character;  no  conversion  or  assignment
+              occurs. The complete conversion specification shall be %%%% .
+
+
+       If a conversion specification is invalid, the behavior is undefined.
+
+       The conversion specifiers AA, EE, FF, GG, and XX are also valid and shall be
+       equivalent to aa, ee, ff, gg, and xx, respectively.
+
+       If end-of-file is encountered during input, conversion shall be  termi-
+       nated.   If  end-of-file  occurs  before any bytes matching the current
+       conversion specification (except for %%nn ) have been  read  (other  than
+       leading white-space characters, where permitted), execution of the cur-
+       rent conversion specification shall terminate with  an  input  failure.
+       Otherwise,  unless execution of the current conversion specification is
+       terminated with a matching failure, execution of the following  conver-
+       sion  specification (if any) shall be terminated with an input failure.
+
+       Reaching the end of the string  in  _s_s_c_a_n_f()  shall  be  equivalent  to
+       encountering end-of-file for _f_s_c_a_n_f().
+
+       If conversion terminates on a conflicting input, the offending input is
+       left  unread  in  the  input.  Any  trailing  white  space   (including
+       <newline>s)  shall be left unread unless matched by a conversion speci-
+       fication. The success of literal matches and suppressed assignments  is
+       only directly determinable via the %%nn conversion specification.
+
+       The  _f_s_c_a_n_f()  and _s_c_a_n_f() functions may mark the _s_t___a_t_i_m_e field of the
+       file associated with _s_t_r_e_a_m for update. The  _s_t___a_t_i_m_e  field  shall  be
+       marked  for  update  by  the  first  successful  execution  of _f_g_e_t_c(),
+       _f_g_e_t_s(), _f_r_e_a_d(), _g_e_t_c(),  _g_e_t_c_h_a_r(),  _g_e_t_s(),  _f_s_c_a_n_f(),  or  _f_s_c_a_n_f()
+       using  _s_t_r_e_a_m  that  returns  data  not  supplied  by  a  prior call to
+       _u_n_g_e_t_c().
+
+RREETTUURRNN VVAALLUUEE
+       Upon successful completion, these functions shall return the number  of
+       successfully  matched and assigned input items; this number can be zero
+       in the event of an early matching failure. If the input ends before the
+       first  matching failure or conversion, EOF shall be returned. If a read
+       error occurs, the error indicator for the stream is set, EOF  shall  be
+       returned,  and _e_r_r_n_o shall be set to indicate the error.
+
+EERRRROORRSS
+       For  the  conditions  under  which  the _f_s_c_a_n_f() functions fail and may
+       fail, refer to _f_g_e_t_c() or _f_g_e_t_w_c().
+
+       In addition, _f_s_c_a_n_f() may fail if:
+
+       EEIILLSSEEQQ Input byte sequence does not form a valid character.
+
+       EEIINNVVAALL There are insufficient arguments.
+
+
+       _T_h_e _f_o_l_l_o_w_i_n_g _s_e_c_t_i_o_n_s _a_r_e _i_n_f_o_r_m_a_t_i_v_e_.
+
+EEXXAAMMPPLLEESS
+       The call:
+
+
+              iinntt ii,, nn;; ffllooaatt xx;; cchhaarr nnaammee[[5500]];;
+              nn == ssccaannff((""%%dd%%ff%%ss"",, &&ii,, &&xx,, nnaammee));;
+
+       with the input line:
+
+
+              2255 5544..3322EE--11 HHaammsstteerr
+
+       assigns to _n the value 3, to _i the value 25, to _x the value 5.432,  and
+       _n_a_m_e contains the string ""HHaammsstteerr"" .
+
+       The call:
+
+
+              iinntt ii;; ffllooaatt xx;; cchhaarr nnaammee[[5500]];;
+              ((vvooiidd)) ssccaannff((""%%22dd%%ff%%**dd %%[[00112233445566778899]]"",, &&ii,, &&xx,, nnaammee));;
+
+       with input:
+
+
+              5566778899 00112233 5566aa7722
+
+       assigns  56  to _i, 789.0 to _x, skips 0123, and places the string ""5566\\00""
+       in _n_a_m_e. The next call to _g_e_t_c_h_a_r() shall return the character ’’aa’’ .
+
+   RReeaaddiinngg DDaattaa iinnttoo aann AArrrraayy
+       The following call uses _f_s_c_a_n_f() to read three  floating-point  numbers
+       from standard input into the _i_n_p_u_t array.
+
+
+              ffllooaatt iinnppuutt[[33]];; ffssccaannff ((ssttddiinn,, ""%%ff %%ff %%ff"",, iinnppuutt,, iinnppuutt++11,, iinnppuutt++22));;
+
+AAPPPPLLIICCAATTIIOONN UUSSAAGGEE
+       If  the  application calling _f_s_c_a_n_f() has any objects of type wwiinntt__tt or
+       wwcchhaarr__tt, it must also  include  the  _<_w_c_h_a_r_._h_>  header  to  have  these
+       objects defined.
+
+RRAATTIIOONNAALLEE
+       This  function  is  aligned with the ISO/IEC 9899:1999 standard, and in
+       doing so a few "obvious" things were not included.   Specifically,  the
+       set  of characters allowed in a scanset is limited to single-byte char-
+       acters. In other similar places, multi-byte characters have  been  per-
+       mitted,  but  for alignment with the ISO/IEC 9899:1999 standard, it has
+       not been done here. Applications needing this could use the correspond-
+       ing wide-character functions to achieve the desired results.
+
+FFUUTTUURREE DDIIRREECCTTIIOONNSS
+       None.
+
+SSEEEE AALLSSOO
+       _g_e_t_c(),  _p_r_i_n_t_f(),  _s_e_t_l_o_c_a_l_e(),  _s_t_r_t_o_d(),  _s_t_r_t_o_l(),  _s_t_r_t_o_u_l(), _w_c_r_-
+       _t_o_m_b(), the Base Definitions volume of IEEE Std 1003.1-2001, Chapter 7,
+       Locale, _<_l_a_n_g_i_n_f_o_._h_>, _<_s_t_d_i_o_._h_>, _<_w_c_h_a_r_._h_>
+
+CCOOPPYYRRIIGGHHTT
+       Portions  of  this text are reprinted and reproduced in electronic form
+       from IEEE Std 1003.1, 2003 Edition, Standard for Information Technology
+       --  Portable  Operating  System  Interface (POSIX), The Open Group Base
+       Specifications Issue 6, Copyright (C) 2001-2003  by  the  Institute  of
+       Electrical  and  Electronics  Engineers, Inc and The Open Group. In the
+       event of any discrepancy between this version and the original IEEE and
+       The  Open Group Standard, the original IEEE and The Open Group Standard
+       is the referee document. The original Standard can be  obtained  online
+       at http://www.opengroup.org/unix/online.html .
+
+
+
+IEEE/The Open Group                  2003                           FSCANF(3P)
