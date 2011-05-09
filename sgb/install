@@ -1,0 +1,10 @@
+#!/bin/bash
+# Usuniecie wczesniej istniejacego folderu
+rm -rf sgb/
+mkdir sgb/
+# Skopiowanie tar do sgb i usunięcie z nadrzędnego 
+cp sgb.tar.gz sgb/.
+rm sgb.tar.gz
+cd sgb/
+# Rozpakowanie tar w folderze
+tar -xvvf sgb.tar.gz
