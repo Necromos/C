@@ -1,3 +1,4 @@
+#SZABLON PRZYGOTOWANY DO UMIESZCZENIA JUZ GOTOWEGO PROJEKTU
 #WSTĘP
 "sgb polish ladders" - polska wersja programu stworzonego przez legendarnego Knuth'a opartego na oryginalnym kodzie źródłowym http://www-cs-faculty.stanford.edu/~uno/sgb.html 
 Słownik polski został przygotowany przez dr. W. Bzyla mozna i jest on dostępny pod adresem: git://sigma.ug.edu.pl/~wbzyl/sgb.git Program NIE obsługuje polskich liter.
