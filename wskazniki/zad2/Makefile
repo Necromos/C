@@ -6,5 +6,5 @@ clean	:
 test1	:
 	./main < test1 > wynik1
 
-main	:
+main	: main.c
 	cc main.c -o main
