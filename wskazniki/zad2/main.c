@@ -8,15 +8,15 @@ int main()
     int i;
 
     for (i = 0; i < 4; i++) {
-	printf("%d", t[i]);
+	printf("%d ", t[i]);
     }
     printf("\n");
 
 
     for (i = 0; i < 4; i++) {
-	a[i] = t[i];
+	a[i] = &t[i];
+	// a[i] = t + i t jest startem wskaznika w tablicy a i zwieksza adres
     }
-    printf("\n");
 
     for (i = 0; i < 4; i++) {
 	printf("%d ", *a[i]);
