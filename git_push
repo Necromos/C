@@ -2,5 +2,5 @@
 
 git init
 git add .
-git commit -m 'Update zadania 9'
+git commit -m 'Update podczas laboratoriow'
 git push -u origin master
