@@ -15,9 +15,9 @@ int main()
 {
     struct rect r1, r2;
 
-    scanrect("Podaj wspolrzedne rect1:", &r1);
+    scanrect("Podaj wsp rct1:", &r1);
 
-    scanrect("Podaj wspolrzedne rect2:", &r2);
+    scanrect("Podaj wsp rct2:", &r2);
 
     printf("%i \n", rectinrect(r1, r2));
 
