@@ -1,5 +1,11 @@
 #include <stdio.h>
 
+void swap(int *a, int *b) {
+	  int temp;
+	    temp = *a; *a = *b; *b = temp;
+}
+
+
 int main()
 {
     int t[4] = { 2, 1, 8, 3 };
@@ -13,10 +19,7 @@ int main()
     for (i = 0; i < 4; i++) {
 	for (j = i + 1; j < 4; j++) {
 	    if (t[i] > t[j]) {
-		int tmp;
-		tmp = a[i];
-		a[i] = a[j];
-		a[j] = tmp;
+		swap(&a[i],&a[j]);
 	    }
 	}
     }
