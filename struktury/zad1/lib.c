@@ -6,8 +6,8 @@ struct point {
 };
 
 struct rect {
-    struct point ll;            /* lower left */
-    struct point ur;            /* upper right */
+    struct point ll;		/* lower left */
+    struct point ur;		/* upper right */
 };
 
 struct point makepoint(int x, int y)
@@ -39,7 +39,8 @@ int rectinrect(struct rect r1, struct rect r2)
     return ptinrect(r1.ll, r2) && ptinrect(r1.ur, r2);
 };
 
-void scanrect (char *prompt,struct rect *r){
+void scanrect(char *prompt, struct rect *r)
+{
     printf(prompt);
     printf("\nll.x: ");
     scanf("%i", &((*r).ll.x));
