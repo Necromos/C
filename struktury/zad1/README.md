@@ -1,0 +1,3 @@
+#Struktury
+
+##Zadanie 1
